@@ -26,3 +26,7 @@ class TestFluidily(unittest.TestCase):
     def test_token(self):
         token = client.get_token(**cfg)
         self.assertEqual(client.token, token)
+
+    def test_applications_get_list(self):
+        apps = client.applications.get_list()
+        self.assertTrue(apps)
