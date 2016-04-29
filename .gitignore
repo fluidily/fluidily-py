@@ -1,0 +1,23 @@
+# IDE
+.project
+.pydevproject
+.settings
+.idea
+
+# python
+fluidily_config.py
+*.pyc
+.coverage
+.eggs
+_doc_build
+__pycache__
+htmlcov
+htmlprof
+dist
+build
+src
+deps
+*.egg-info
+
+MANIFEST
+.DS_Store
