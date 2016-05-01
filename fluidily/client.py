@@ -2,7 +2,7 @@ from .config import token_from_config
 
 
 class Fluidily:
-    """Python client to fluidily.com
+    """Python client to fluidily.com API
     """
     url = 'http://fluidily.com'
 
@@ -22,6 +22,12 @@ class Fluidily:
 
     def urls(self):
         return self.execute(self.url)
+
+    def version(self):
+        return self.execute('%s/info/version' % self.url)
+
+    def python(self):
+        return self.execute('%s/info/python' % self.url)
 
     def get_token(self, **params):
         """"""
@@ -82,6 +88,10 @@ class Fluid:
 
     def create(self, **params):
         return self.root.execute(self.url, 'post', json=params)
+
+    def update(self, id, **params):
+        url = '%s/%s' % (self.url, id)
+        return self.root.execute(url, 'post', json=params)
 
     def delete(self, id):
         return self.root.execute('%s/%s' % (self.url, id), 'delete')
