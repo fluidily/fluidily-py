@@ -29,7 +29,7 @@ class Fluidily:
         self.token = None
         try:
             data = self.execute(self.url + '/authorizations',
-                                'post', data=params)
+                                'post', json=params)
         except Exception:
             self.token = token
             raise
@@ -41,7 +41,6 @@ class Fluidily:
         headers = headers or {}
         if self.token:
             headers['Authorization'] = 'Bearer %s' % self.token
-        headers['Content-Type'] = 'application/json'
         headers['Accept'] = 'application/json, text/*; q=0.5'
         response = self.sessions.request(method, url, headers=headers,
                                          **params)
@@ -53,7 +52,7 @@ class Fluidily:
             except Exception:
                 error = response.text
             raise FluidilyError(response.status_code, error)
-        if response.raise_for_status == 204:
+        if response.status_code == 204:
             return True
         return response.json()
 
