@@ -52,7 +52,11 @@ class TestFluidily(unittest.TestCase):
     # APPLICATIONS
     def test_applications_get_list(self):
         apps = client.applications.get_list()
-        self.assertTrue(apps)
+        self.assertTrue(apps['result'])
+
+    def test_applications_set_config(self):
+        app = client.applications.get(test_app)
+        self.assertEqual(app.name, test_app)
 
     # TEMPLATES
     def test_template_create_fail(self):

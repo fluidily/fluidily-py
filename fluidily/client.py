@@ -4,7 +4,7 @@ from .config import token_from_config
 class Fluidily:
     """Python client to fluidily.com API
     """
-    url = 'http://fluidily.com'
+    url = 'https://api.fluidily.com'
 
     def __init__(self, url=None, sessions=None, token=None):
         if sessions is None:
@@ -81,24 +81,29 @@ class Fluid:
     __str__ = __repr__
 
     def get_list(self, **params):
-        return self.root.execute(self.url, **params)
+        return self.execute(self.url, params=params)
 
     def get(self, id):
-        return self.root.execute('%s/%s' % (self.url, id))
+        return self.execute('%s/%s' % (self.url, id))
 
     def create(self, **params):
-        return self.root.execute(self.url, 'post', json=params)
+        return self.execute(self.url, 'post', json=params)
 
     def update(self, id, **params):
         url = '%s/%s' % (self.url, id)
-        return self.root.execute(url, 'post', json=params)
+        return self.execute(url, 'post', json=params)
 
     def delete(self, id):
-        return self.root.execute('%s/%s' % (self.url, id), 'delete')
+        return self.execute('%s/%s' % (self.url, id), 'delete')
+
+    def execute(self, url, method=None, **params):
+        return self.root.execute(url, method, **params)
 
 
 class Applications(Fluid):
-    pass
+
+    def get(self, id):
+        return Application(self, super().get(id))
 
 
 class Organisations(Fluid):
@@ -106,8 +111,28 @@ class Organisations(Fluid):
 
 
 class Contents(Fluid):
+
+    def get_list(self, application=None, **params):
+        url = self.url
+        if application:
+            url = '%s/%s' % (url, application)
+        return self.root.execute(url, params=params)
+
+
+class Templates(Contents):
     pass
 
 
-class Templates(Fluid):
-    pass
+class Application:
+
+    def __init__(self, root, app):
+        self.__dict__.update(app)
+        self.root = root
+
+    def __repr__(self):
+        return self.url
+    __str__ = __repr__
+
+    def set_config(self, key, value):
+        url = '%s/config' % self.url
+        return self.root.execute(url, 'post', json={key: value})
