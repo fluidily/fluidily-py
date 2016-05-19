@@ -5,7 +5,7 @@ from fluidily import Fluidily, FluidilyError
 
 
 try:
-    import fluidily_config  # noqa
+    import fluidev  # noqa
 except ImportError:
     pass
 

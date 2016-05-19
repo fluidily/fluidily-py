@@ -5,7 +5,7 @@
 .idea
 
 # python
-fluidily_config.py
+fluidev.py
 *.pyc
 .coverage
 .eggs
