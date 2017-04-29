@@ -1,15 +1,18 @@
-from .config import token_from_config
+from .config import from_config
 
 
 class Fluidily:
-    """Python client to fluidily.com API
+    """Python client to api.fluidily.com
     """
     url = 'https://api.fluidily.com'
 
-    def __init__(self, url=None, sessions=None, token=None):
+    def __init__(self, url=None, sessions=None, token=None, credentials=None):
         if sessions is None:
             import requests
             sessions = requests.Session()
+        token, url = from_config(
+            '.fluidily', credentials, token=token, url=url
+        )
         self.url = url or self.url
         self.token = token
         self.sessions = sessions
@@ -17,8 +20,10 @@ class Fluidily:
         self.organisations = Organisations(self)
         self.contents = Contents(self)
         self.templates = Templates(self)
-        if token is None:
-            self.token = token_from_config('.fluidily')
+
+    def __repr__(self):
+        return self.url
+    __str__ = __repr__
 
     def urls(self):
         return self.execute(self.url)
@@ -80,6 +85,9 @@ class Fluid:
         return self.url
     __str__ = __repr__
 
+
+class FluidCRUD(Fluid):
+
     def get_list(self, **params):
         return self.execute(self.url, params=params)
 
@@ -91,7 +99,7 @@ class Fluid:
 
     def update(self, id, **params):
         url = '%s/%s' % (self.url, id)
-        return self.execute(url, 'post', json=params)
+        return self.execute(url, 'patch', json=params)
 
     def delete(self, id):
         return self.execute('%s/%s' % (self.url, id), 'delete')
@@ -100,17 +108,17 @@ class Fluid:
         return self.root.execute(url, method, **params)
 
 
-class Applications(Fluid):
+class Applications(FluidCRUD):
 
     def get(self, id):
         return Application(self, super().get(id))
 
 
-class Organisations(Fluid):
+class Organisations(FluidCRUD):
     pass
 
 
-class Contents(Fluid):
+class Contents(FluidCRUD):
 
     def get_list(self, application=None, **params):
         url = self.url
@@ -123,16 +131,17 @@ class Templates(Contents):
     pass
 
 
-class Application:
+class Application(Fluid):
 
     def __init__(self, root, app):
         self.__dict__.update(app)
-        self.root = root
-
-    def __repr__(self):
-        return self.url
-    __str__ = __repr__
+        self.contents = Contents(self)
+        self.templates = Templates(self)
+        super().__init__(root, self.name)
 
     def set_config(self, key, value):
         url = '%s/config' % self.url
         return self.root.execute(url, 'post', json={key: value})
+
+    def execute(self, url, method=None, **params):
+        return self.root.execute(url, method, **params)

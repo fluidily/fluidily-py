@@ -1,0 +1,6 @@
+
+test:
+  override:
+    - python setup.py test --coverage -q
+    - flake8
+    - coverage html -d $CIRCLE_ARTIFACTS/htmlcov
